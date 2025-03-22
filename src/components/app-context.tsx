@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, ReactNode, useEffect } from 'react'
 import { getAgents } from '@/utils/api-agent'
+import { getJobs } from '@/utils/api-job'
 
 export interface Agent {
   id: number
@@ -82,9 +83,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (refreshAgents) {
       handleGetAgents()
-      setRefreshJobs(false)
     }
   }, [refreshAgents])
+
+  const handleGetJobs = async () => {
+    const response = await getJobs()
+    setJobs(response)
+    setRefreshJobs(false)
+  }
+
+  useEffect(() => {
+    if (refreshJobs) {
+      handleGetJobs()
+    }
+  }, [refreshJobs])
 
   const value = {
     agents,

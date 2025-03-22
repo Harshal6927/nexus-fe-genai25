@@ -75,7 +75,7 @@ export default function PostJobPage() {
       job_contact_email: values.contactEmail,
     })
 
-    if (response?.status === 'success') {
+    if (response === 201) {
       form.reset()
       setRefreshJobs(true)
     }
@@ -234,7 +234,12 @@ export default function PostJobPage() {
                   </div>
 
                   <div className="flex justify-end pt-4">
-                    <Button type="submit" size="lg" disabled={isSubmitting}>
+                    <Button
+                      type="submit"
+                      size="lg"
+                      disabled={isSubmitting}
+                      className="hover:cursor-pointer"
+                    >
                       {isSubmitting ? 'Posting...' : 'Post Job'}
                     </Button>
                   </div>

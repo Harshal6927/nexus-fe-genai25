@@ -31,6 +31,7 @@ export const getJobs = async () => {
     })
     .catch((error) => {
       toast.error(error.response.data.message)
+      return []
     })
 }
 
@@ -41,7 +42,7 @@ export const createJob = async (data: CreateJobData) => {
       toast.success('Job Posted Successfully', {
         description: 'Your job has been posted and is now live.',
       })
-      return response.data
+      return response.status
     })
     .catch((error) => {
       toast.error(error.response.data.message)

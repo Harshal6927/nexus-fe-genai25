@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { ChevronRight, FilePlus2, type LucideIcon } from 'lucide-react'
 import {
   Collapsible,
@@ -18,7 +17,6 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar'
 import { useRouter } from 'next/navigation'
-import { getJobs } from '@/utils/api-job'
 import { useAppContext } from '@/components/app-context'
 
 export function NavMain({
@@ -32,31 +30,8 @@ export function NavMain({
   }[]
 }) {
   const { push } = useRouter()
-  const [loading, setLoading] = useState(false)
 
-  const {
-    jobs: subMenuItems,
-    setJobs: setSubMenuItems,
-    refreshJobs,
-    setRefreshJobs,
-  } = useAppContext()
-
-  useEffect(() => {
-    if (refreshJobs) {
-      const getSubMenuItems = async () => {
-        setLoading(true)
-        try {
-          const data = await getJobs()
-          setSubMenuItems(data)
-        } finally {
-          setLoading(false)
-        }
-      }
-
-      getSubMenuItems()
-      setRefreshJobs(false)
-    }
-  }, [refreshJobs])
+  const { jobs: subMenuItems } = useAppContext()
 
   return (
     <SidebarGroup className="p-0 px-2">
@@ -104,23 +79,17 @@ export function NavMain({
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <SidebarMenuSub>
-                  {loading ? (
-                    <div className="px-4 py-2 text-sm text-muted-foreground">
-                      Loading...
-                    </div>
-                  ) : (
-                    subMenuItems.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.id}>
-                        <SidebarMenuSubButton
-                          asChild
-                          onClick={() => push(`/dashboard/home/${subItem.id}`)}
-                          className={'hover:cursor-pointer'}
-                        >
-                          <span>{subItem.job_title}</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))
-                  )}
+                  {subMenuItems.map((subItem) => (
+                    <SidebarMenuSubItem key={subItem.id}>
+                      <SidebarMenuSubButton
+                        asChild
+                        onClick={() => push(`/dashboard/home/${subItem.id}`)}
+                        className={'hover:cursor-pointer'}
+                      >
+                        <span>{subItem.job_title}</span>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  ))}
                 </SidebarMenuSub>
               </CollapsibleContent>
             </SidebarMenuItem>

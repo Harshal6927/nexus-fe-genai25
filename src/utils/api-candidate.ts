@@ -18,7 +18,7 @@ export const deleteJobApplication = async (applicationId: number) => {
   return axios
     .delete(`${API_URL}/job-applications/${applicationId}`)
     .then((response) => {
-      toast.success(response.data.message)
+      toast.success('Job application deleted successfully')
     })
     .catch((error) => {
       toast.error(error.response.data.message)
