@@ -54,3 +54,29 @@ export const applyJobApplication = async (
       toast.error(error.response.data.message)
     })
 }
+
+export const getPreSignedUrl = async (file_name: string) => {
+  return axios
+    .get(`${API_URL}/job-applications/signed-url/${file_name}`)
+    .then((response) => {
+      return response.data
+    })
+    .catch((error) => {
+      toast.error(error.response.data.message)
+    })
+}
+
+export const uploadResume = async (url: string, file: File) => {
+  return axios
+    .put(url, file, {
+      headers: {
+        'Content-Type': file.type,
+      },
+    })
+    .then((response) => {
+      return response.data
+    })
+    .catch((error) => {
+      toast.error(error.response.data.message)
+    })
+}

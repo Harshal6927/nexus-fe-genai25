@@ -413,22 +413,8 @@ export default function JobDetailPage() {
                         </div>
                       )}
                     </CardContent>
-                    <CardFooter className="flex justify-between pt-2">
+                    <CardFooter className="flex justify-between">
                       <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8"
-                          onClick={() =>
-                            // window.open(candidate.candidate_resume, '_blank')
-                            console.log('Viewing candidate details...')
-                          }
-                          disabled={!candidate.candidate_resume}
-                        >
-                          <FileText className="h-3.5 w-3.5 mr-1" />
-                          Resume
-                        </Button>
-
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button
