@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronsUpDown, Sun, Moon } from 'lucide-react'
+import { ChevronsUpDown, Sun, Moon, LogOut } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -18,6 +18,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { useAuth } from './auth-context'
+import { redirect } from 'next/navigation'
 
 export function NavUser({
   user,
@@ -30,6 +32,7 @@ export function NavUser({
 }) {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark')
   const { isMobile } = useSidebar()
+  const { logOut } = useAuth()
 
   const handleThemeChange = () => {
     const currentTheme =
@@ -39,6 +42,15 @@ export function NavUser({
     setTheme(currentTheme)
 
     window.dispatchEvent(new Event('storage'))
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logOut()
+      redirect('/login')
+    } catch (error) {
+      console.error('Failed to log out:', error)
+    }
   }
 
   return (
@@ -98,6 +110,17 @@ export function NavUser({
                     Light
                   </>
                 )}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                className="cursor-pointer text-red-500 hover:text-red-600 focus:text-red-600"
+                onClick={handleLogout}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Log Out
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

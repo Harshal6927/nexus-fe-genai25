@@ -1,11 +1,23 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { AppSidebar } from '@/components/app-sidebar'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AppProvider } from '@/components/app-context'
+import { useAuth } from '@/components/auth-context'
+import { redirect } from 'next/navigation'
 
 export default function Layout({ children }: { children: ReactNode }) {
+  const { user } = useAuth()
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (!user) {
+        redirect('/login')
+      }
+    }, 500)
+  }, [user])
+
   return (
     <AppProvider>
       <SidebarProvider>

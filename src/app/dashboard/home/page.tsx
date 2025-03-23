@@ -186,8 +186,10 @@ export default function Page() {
         >
           <div className="text-center mb-4">
             <TabsList className="inline-flex">
-              <TabsTrigger value="features">Why Choose Nexus</TabsTrigger>
-              <TabsTrigger value="matching">
+              <TabsTrigger value="features" className="hover:cursor-pointer">
+                Why Choose Nexus
+              </TabsTrigger>
+              <TabsTrigger value="matching" className="hover:cursor-pointer">
                 Smart Candidate Matching
               </TabsTrigger>
             </TabsList>

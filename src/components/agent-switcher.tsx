@@ -47,7 +47,7 @@ export function AgentSwitcher() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="sm"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:cursor-pointer"
             >
               <div className="grid flex-1 text-left text-sm leading-tight">
                 {activeAgent ? (
@@ -92,7 +92,7 @@ export function AgentSwitcher() {
 
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="gap-2 p-2"
+              className="gap-2 p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer"
               onClick={() => push('/dashboard/config/agent')}
             >
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
