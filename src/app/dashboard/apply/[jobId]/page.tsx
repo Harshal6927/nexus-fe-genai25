@@ -53,10 +53,10 @@ const formSchema = z.object({
   linkedinUrl: z.string().url({
     message: 'Please enter a valid LinkedIn URL.',
   }),
-  githubUrl: z
+  githubUsername: z
     .string()
-    .url({
-      message: 'Please enter a valid GitHub URL.',
+    .regex(/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i, {
+      message: 'Please enter a valid GitHub username without URL.',
     })
     .optional()
     .or(z.literal('')),
@@ -68,7 +68,6 @@ const formSchema = z.object({
     .optional()
     .or(z.literal('')),
 })
-
 export default function JobApplicationPage() {
   const [job, setJob] = useState<Job | null>(null)
   const params = useParams()
@@ -105,7 +104,7 @@ export default function JobApplicationPage() {
       currentRole: '',
       yearsOfExperience: '',
       linkedinUrl: '',
-      githubUrl: '',
+      githubUsername: '',
       portfolioUrl: '',
     },
   })
@@ -144,32 +143,37 @@ export default function JobApplicationPage() {
 
     setIsSubmitting(true)
 
-    const signedUrl = await getPreSignedUrl(resumeFile.name)
+    try {
+      const signedUrl = await getPreSignedUrl(resumeFile.name)
 
-    if (!signedUrl) {
+      if (!signedUrl) {
+        toast.error('Failed to upload resume. Please try again.')
+        return
+      }
+
+      await uploadResume(signedUrl, resumeFile)
+
+      await applyJobApplication(jobId, {
+        candidate_name: values.fullName,
+        candidate_email: values.email,
+        candidate_phone: values.phone,
+        candidate_current_role: values.currentRole,
+        candidate_current_yoe: parseInt(values.yearsOfExperience),
+        candidate_resume_id: resumeFile.name,
+        candidate_linkedin: values.linkedinUrl,
+        candidate_github: values.githubUsername,
+        candidate_portfolio: values.portfolioUrl,
+      })
+
+      toast.success('Application submitted successfully!')
+      form.reset()
+      setResumeFile(null)
+    } catch (error) {
+      toast.error('Failed to submit application. Please try again.')
+      console.error(error)
+    } finally {
       setIsSubmitting(false)
-      toast.error('Failed to upload resume. Please try again.')
-      return
     }
-
-    const formData = new FormData()
-    formData.append('file', resumeFile)
-
-    await uploadResume(signedUrl, resumeFile)
-
-    await applyJobApplication(jobId, {
-      candidate_name: values.fullName,
-      candidate_email: values.email,
-      candidate_phone: values.phone,
-      candidate_current_role: values.currentRole,
-      candidate_current_yoe: parseInt(values.yearsOfExperience),
-      candidate_resume_id: resumeFile.name,
-      candidate_linkedin: values.linkedinUrl,
-      candidate_github: values.githubUrl,
-      candidate_portfolio: values.portfolioUrl,
-    })
-    setIsSubmitting(false)
-    form.reset()
   }
 
   return (
@@ -369,19 +373,19 @@ export default function JobApplicationPage() {
 
                       <FormField
                         control={form.control}
-                        name="githubUrl"
+                        name="githubUsername"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="flex items-center gap-1">
                               <Github className="h-4 w-4" />
-                              GitHub Profile
+                              GitHub Username
                             </FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="https://github.com/yourusername"
-                                {...field}
-                              />
+                              <Input placeholder="yourusername" {...field} />
                             </FormControl>
+                            <FormDescription>
+                              Enter only your GitHub username, not the full URL
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
