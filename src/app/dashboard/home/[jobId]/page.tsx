@@ -114,7 +114,7 @@ export default function JobDetailPage() {
   const [isDeletingApplication, setIsDeletingApplication] = useState<
     number | null
   >(null)
-  const { setRefreshJobs } = useAppContext()
+  const { setRefreshJobs, activeAgent, activeLLM } = useAppContext()
   const { push } = useRouter()
   const params = useParams()
   const jobId = params.jobId as string
@@ -130,7 +130,15 @@ export default function JobDetailPage() {
   }
 
   const fetchJobApplications = async () => {
-    const jobApplications = await getJobApplications(jobId)
+    if (!activeAgent) {
+      return
+    }
+
+    const jobApplications = await getJobApplications(
+      jobId,
+      activeAgent.id,
+      activeLLM.name,
+    )
     setCandidates(jobApplications)
   }
 
@@ -140,13 +148,13 @@ export default function JobDetailPage() {
       await fetchJobApplications()
     }
     jobHelper()
-  }, [jobId])
+  }, [jobId, activeAgent, activeLLM])
 
   const handleDeleteJob = async () => {
     setIsDeleting(true)
     try {
       const response = await deleteJob(jobId)
-      if (response?.status === 'success') {
+      if (response === 200) {
         setRefreshJobs(true)
         push('/dashboard/home')
       }
@@ -405,22 +413,8 @@ export default function JobDetailPage() {
                         </div>
                       )}
                     </CardContent>
-                    <CardFooter className="flex justify-between pt-2">
+                    <CardFooter className="flex justify-between">
                       <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8"
-                          onClick={() =>
-                            // window.open(candidate.candidate_resume, '_blank')
-                            console.log('Viewing candidate details...')
-                          }
-                          disabled={!candidate.candidate_resume}
-                        >
-                          <FileText className="h-3.5 w-3.5 mr-1" />
-                          Resume
-                        </Button>
-
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button

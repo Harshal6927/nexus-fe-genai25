@@ -20,7 +20,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { getJobDetails, Job } from '@/utils/api-job'
-import { applyJobApplication } from '@/utils/api-candidate'
+import {
+  applyJobApplication,
+  getPreSignedUrl,
+  uploadResume,
+} from '@/utils/api-candidate'
+import { toast } from 'sonner'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 const ACCEPTED_FILE_TYPES = [
@@ -131,7 +136,7 @@ export default function JobApplicationPage() {
     setResumeFile(file)
   }
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!resumeFile) {
       setResumeError('Please upload your resume')
       return
@@ -139,7 +144,20 @@ export default function JobApplicationPage() {
 
     setIsSubmitting(true)
 
-    applyJobApplication(jobId, {
+    const signedUrl = await getPreSignedUrl(resumeFile.name)
+
+    if (!signedUrl) {
+      setIsSubmitting(false)
+      toast.error('Failed to upload resume. Please try again.')
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('file', resumeFile)
+
+    await uploadResume(signedUrl, resumeFile)
+
+    await applyJobApplication(jobId, {
       candidate_name: values.fullName,
       candidate_email: values.email,
       candidate_phone: values.phone,
