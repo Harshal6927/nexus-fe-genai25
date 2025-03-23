@@ -48,7 +48,7 @@ const LLMS: LLM[] = [
   },
   {
     name: 'command-r-plus-08-2024',
-    displayName: 'COMMAND R PLUS',
+    displayName: 'Command R Plus',
     provider: 'Cohere',
     isLatest: true,
   },
