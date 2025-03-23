@@ -2,9 +2,13 @@ import axios from 'axios'
 import { API_URL } from '@/lib/constants'
 import { toast } from 'sonner'
 
-export const getJobApplications = async (jobId: string) => {
+export const getJobApplications = async (
+  jobId: string,
+  agent: number,
+  llm: string,
+) => {
   return axios
-    .get(`${API_URL}/job-applications/${jobId}`)
+    .get(`${API_URL}/job-applications/${jobId}/${agent}/${llm}`)
     .then((response) => {
       return response.data.job_applications
     })

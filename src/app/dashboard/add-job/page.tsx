@@ -188,7 +188,7 @@ export default function PostJobPage() {
                           <FormControl>
                             <Textarea
                               placeholder="Provide a detailed description of the job role, responsibilities, and company culture..."
-                              className="min-h-[150px]"
+                              className="w-full min-h-[100px] max-h-[150px] max-w-[555px]"
                               {...field}
                             />
                           </FormControl>
@@ -206,7 +206,7 @@ export default function PostJobPage() {
                           <FormControl>
                             <Textarea
                               placeholder="List the skills, qualifications, and experience required for this position..."
-                              className="min-h-[150px]"
+                              className="w-full min-h-[100px] max-h-[150px] max-w-[555px]"
                               {...field}
                             />
                           </FormControl>

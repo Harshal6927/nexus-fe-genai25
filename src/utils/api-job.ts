@@ -63,12 +63,12 @@ export const getJobDetails = async (jobId: string) => {
 
 export const deleteJob = async (jobId: string) => {
   return axios
-    .post(`${API_URL}/jobs/${jobId}`)
+    .delete(`${API_URL}/jobs/${jobId}`)
     .then((response) => {
       toast.success('Job Deleted Successfully', {
         description: 'Your job has been deleted successfully.',
       })
-      return response.data
+      return response.status
     })
     .catch((error) => {
       toast.error(error.response.data.message)
