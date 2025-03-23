@@ -46,6 +46,12 @@ const LLMS: LLM[] = [
     displayName: 'Gemini 1.5 Flash 8B',
     provider: 'Google',
   },
+  {
+    name: 'command-r-plus-08-2024',
+    displayName: 'COMMAND R PLUS',
+    provider: 'Cohere',
+    isLatest: true,
+  },
 ]
 
 interface AppContextType {
