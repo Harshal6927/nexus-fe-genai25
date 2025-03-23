@@ -38,11 +38,14 @@ const data = {
   ],
 }
 
-export function AppSidebar({ className, ...props }: ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  className,
+  ...props
+}: ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar 
-      collapsible="icon" 
-      className={cn("h-screen bg-background", className)} 
+    <Sidebar
+      collapsible="icon"
+      className={cn('h-screen bg-background', className)}
       {...props}
     >
       <SidebarHeader>
