@@ -1,24 +1,126 @@
 'use client'
 
 import { MagnifyingGlassIcon, CommandLineIcon, GlobeAltIcon, UserGroupIcon } from '@heroicons/react/24/outline'
+import { useEffect, useRef } from 'react'
+import { gsap } from 'gsap'
 
 export default function Page() {
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const tl2Ref = useRef<gsap.core.Timeline | null>(null);
+
+  useEffect(() => {
+    // Initialize animations
+    tlRef.current = gsap.timeline({
+      defaults: {
+        duration: 2,
+        yoyo: true,
+        ease: 'power2.inOut'
+      }
+    })
+    .fromTo('.left, .right', {
+      svgOrigin: '640 500',
+      skewY: (i) => [-30, 15][i],
+      scaleX: (i) => [0.6, 0.85][i],
+      x: 200
+    }, {
+      skewY: (i) => [-15, 30][i],
+      scaleX: (i) => [0.85, 0.6][i],
+      x: -200
+    })
+    .play(.5);
+
+    tl2Ref.current = gsap.timeline();
+    document.querySelectorAll('.animated-text text').forEach((t, i) => {
+      tl2Ref.current?.add(
+        gsap.fromTo(t, {
+          xPercent: -100,
+          x: 700
+        }, {
+          duration: 1,
+          xPercent: 0,
+          x: 575,
+          ease: 'sine.inOut'
+        }),
+        i % 3 * 0.2
+      );
+    });
+
+    // Add mouse move handler
+    const handlePointerMove = (e: PointerEvent) => {
+      if (tlRef.current) tlRef.current.pause();
+      if (tl2Ref.current) tl2Ref.current.pause();
+      
+      gsap.to([tlRef.current, tl2Ref.current], {
+        duration: 2,
+        ease: 'power4',
+        progress: e.x / window.innerWidth
+      });
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+
+    // Cleanup on component unmount
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Custom styles for animation */}
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
+        
+        .animation-container {
+          position: relative;
+          width: 100%;
+          height: 50vh;
+          overflow: hidden;
+        }
+        
+        .animation-container svg {
+          width: 100%;
+          height: 100%;
+        }
+        
+        .animated-text {
+          font-family: "Montserrat", sans-serif;
+          font-optical-sizing: auto;
+          font-weight: 900;
+          font-style: normal;
+        }
+      `}</style>
+
+      {/* Animation Section */}
+      <div className="animation-container">
+        <svg viewBox="0 0 1280 720">
+          <mask id="maskLeft">
+            <rect x="-50%" width="100%" height="100%" fill="#fff"/>
+          </mask>
+          <mask id="maskRight">
+            <rect x="50%" width="100%" height="100%" fill="#fff"/>
+          </mask>
+          <g fontSize="150" className="animated-text">
+            <g mask="url(#maskLeft)" fill="#d587fa" className="left">
+              <text y="120">BETTER</text>
+              <text y="250">TECH</text>
+              <text y="380">HIRING</text>
+            </g>
+            <g mask="url(#maskRight)" fill="#d587fa" className="right">
+              <text y="120">BETTER</text>
+              <text y="250">TECH</text>
+              <text y="380">HIRING</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+
       <header className="relative bg-black py-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-5xl font-bold mb-6">Revolutionizing Tech Hiring</h1>
           <p className="text-xl mb-8 opacity-90">
             Connect with perfect candidates through AI-powered analysis of their skills, experience, and potential
           </p>
-          <div className="flex justify-center gap-4">
-            <button className="px-8 py-3 bg-white text-black rounded-lg font-semibold hover:bg-opacity-90 transition-all">
-              Get Started
-            </button>
-            <button className="px-8 py-3 border border-white rounded-lg hover:bg-white hover:text-black transition-all">
-              How It Works
-            </button>
-          </div>
         </div>
       </header>
 
@@ -81,21 +183,6 @@ export default function Page() {
                 <p className="text-gray-300">{feature.description}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-black py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Hiring?</h2>
-          <p className="text-gray-300 mb-8">Join hundreds of companies already finding their perfect matches</p>
-          <div className="flex justify-center gap-4">
-            <button className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all">
-              Start Free Trial
-            </button>
-            <button className="px-8 py-3 border border-gray-700 rounded-lg hover:bg-gray-800 transition-all">
-              Schedule Demo
-            </button>
           </div>
         </div>
       </section>
