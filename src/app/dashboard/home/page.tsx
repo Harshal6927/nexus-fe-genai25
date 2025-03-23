@@ -1,12 +1,48 @@
 'use client'
 
 import { MagnifyingGlassIcon, CommandLineIcon, GlobeAltIcon, UserGroupIcon } from '@heroicons/react/24/outline'
-import { useEffect, useRef } from 'react'
+import { BrainCircuit, Clock, ThumbsUp } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
+import { useTheme } from 'next-themes'
 
 export default function Page() {
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const tl2Ref = useRef<gsap.core.Timeline | null>(null);
+  const { theme } = useTheme();
+  const [activeSection, setActiveSection] = useState<'matching' | 'features'>('matching');
+  const cardSectionRef = useRef<HTMLDivElement>(null);
+
+  // Timer to automatically switch between sections
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveSection(prev => prev === 'matching' ? 'features' : 'matching');
+    }, 8000); // Switch every 8 seconds
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  // Animation for switching between sections
+  useEffect(() => {
+    if (cardSectionRef.current) {
+      const matchingSection = cardSectionRef.current.querySelector('.matching-section');
+      const featuresSection = cardSectionRef.current.querySelector('.features-section');
+      
+      if (matchingSection && featuresSection) {
+        gsap.to(matchingSection, {
+          opacity: activeSection === 'matching' ? 1 : 0,
+          duration: 0.5,
+          display: activeSection === 'matching' ? 'flex' : 'none'
+        });
+        
+        gsap.to(featuresSection, {
+          opacity: activeSection === 'features' ? 1 : 0,
+          duration: 0.5,
+          display: activeSection === 'features' ? 'block' : 'none'
+        });
+      }
+    }
+  }, [activeSection]);
 
   useEffect(() => {
     // Initialize animations
@@ -65,8 +101,12 @@ export default function Page() {
     };
   }, []);
 
+  // Determine text color based on theme
+  const textColor = theme === 'dark' ? '#FFFFFF' : '#000000';
+  const textColorMuted = theme === 'dark' ? '#AAAAAA' : '#666666';
+
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="h-screen overflow-hidden bg-background text-foreground flex flex-col">
       {/* Custom styles for animation */}
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
@@ -74,7 +114,7 @@ export default function Page() {
         .animation-container {
           position: relative;
           width: 100%;
-          height: 50vh;
+          height: 30vh; /* Reduced height */
           overflow: hidden;
         }
         
@@ -89,6 +129,32 @@ export default function Page() {
           font-weight: 900;
           font-style: normal;
         }
+        
+        .section-tabs {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 0.5rem; /* Reduced margin */
+        }
+        
+        .section-tab {
+          padding: 0.5rem 1rem;
+          cursor: pointer;
+          border-bottom: 2px solid transparent;
+          transition: all 0.3s ease;
+        }
+        
+        .section-tab.active {
+          border-bottom-color: hsl(var(--primary));
+          color: hsl(var(--primary));
+        }
+        
+        .matching-section, .features-section {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
       `}</style>
 
       {/* Animation Section */}
@@ -101,13 +167,13 @@ export default function Page() {
             <rect x="50%" width="100%" height="100%" fill="#fff"/>
           </mask>
           <g fontSize="150" className="animated-text">
-            <g mask="url(#maskLeft)" fill="#d587fa" className="left">
-              <text y="120">BETTER</text>
+            <g mask="url(#maskLeft)" className="left" fill={textColor}>
+              <text y="120">ELEVATING</text>
               <text y="250">TECH</text>
               <text y="380">HIRING</text>
             </g>
-            <g mask="url(#maskRight)" fill="#d587fa" className="right">
-              <text y="120">BETTER</text>
+            <g mask="url(#maskRight)" className="right" fill={textColorMuted}>
+              <text y="120">ELEVATING</text>
               <text y="250">TECH</text>
               <text y="380">HIRING</text>
             </g>
@@ -115,77 +181,103 @@ export default function Page() {
         </svg>
       </div>
 
-      <header className="relative bg-black py-20 px-4">
+      {/* Reduced top padding in header */}
+      <header className="py-4 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-6">Revolutionizing Tech Hiring</h1>
-          <p className="text-xl mb-8 opacity-90">
+          <h3 className="text-3xl font-bold">
             Connect with perfect candidates through AI-powered analysis of their skills, experience, and potential
-          </p>
+          </h3>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-16 -mt-20">
-        <div className="bg-gray-900 rounded-xl shadow-xl p-8 border border-gray-800">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 bg-gray-800 rounded-lg p-4 h-64">
-              {/* Placeholder for platform screenshot/mockup */}
-              <div className="w-full h-full bg-gray-700 rounded-lg animate-pulse" />
-            </div>
-            <div className="flex-1 space-y-4">
-              <h3 className="text-2xl font-bold">Smart Candidate Matching</h3>
-              <p className="text-gray-300">
-                Our AI analyzes multiple data sources to find candidates who truly fit your requirements:
-              </p>
+      {/* Section tabs */}
+      <div className="section-tabs">
+        <div 
+          className={`section-tab ${activeSection === 'matching' ? 'active' : ''}`}
+          onClick={() => setActiveSection('matching')}
+        >
+          Smart Candidate Matching
+        </div>
+        <div 
+          className={`section-tab ${activeSection === 'features' ? 'active' : ''}`}
+          onClick={() => setActiveSection('features')}
+        >
+          Why Choose Nexus
+        </div>
+      </div>
+
+      {/* Combined card section with animation - now using flex-1 to take remaining space */}
+      <div className="flex-1 max-w-7xl w-full mx-auto px-4 py-4 relative" ref={cardSectionRef}>
+        {/* Smart Candidate Matching Section - Centered and enhanced */}
+        <div className="matching-section" style={{display: activeSection === 'matching' ? 'flex' : 'none'}}>
+          <div className="bg-card rounded-xl shadow-xl p-8 border border-border w-full flex items-center justify-center">
+            <div className="max-w-2xl w-full">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold mb-3">Smart Candidate Matching</h3>
+                <p className="text-muted-foreground">
+                  Our AI analyzes multiple data sources to find candidates who truly fit your requirements
+                </p>
+              </div>
+              
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { icon: CommandLineIcon, label: 'Code Repositories' },
-                  { icon: UserGroupIcon, label: 'Social Profiles' },
-                  { icon: GlobeAltIcon, label: 'Portfolio Sites' },
-                  { icon: MagnifyingGlassIcon, label: 'Deep Analysis' },
+                  { icon: CommandLineIcon, label: 'Code Repositories', description: 'Analyze GitHub, GitLab, and other code repositories' },
+                  { icon: UserGroupIcon, label: 'Social Profiles', description: 'Review LinkedIn, Twitter and professional networks' },
+                  { icon: GlobeAltIcon, label: 'Portfolio Sites', description: 'Examine personal websites and project portfolios' },
+                  { icon: MagnifyingGlassIcon, label: 'Deep Analysis', description: 'Comprehensive skills and cultural fit assessment' },
                 ].map((item, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg">
-                    <item.icon className="h-6 w-6 text-blue-400" />
-                    <span className="text-gray-100">{item.label}</span>
+                  <div key={index} className="flex flex-col p-4 bg-muted rounded-lg border border-border/40 hover:border-primary/40 transition-colors">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="bg-primary/10 p-2 rounded-md">
+                        <item.icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <span className="font-medium">{item.label}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{item.description}</p>
                   </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <section className="bg-gray-900 py-20 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-12">Why Choose Nexus?</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: 'Deep Insights',
-                description: 'Go beyond resumes with comprehensive analysis of actual skills and experience',
-                color: 'bg-blue-900'
-              },
-              {
-                title: 'Time Saver',
-                description: 'Reduce screening time by 80% with automated candidate matching',
-                color: 'bg-purple-900'
-              },
-              {
-                title: 'Better Matches',
-                description: 'Proprietary algorithm identifies candidates most likely to succeed',
-                color: 'bg-green-900'
-              },
-            ].map((feature, index) => (
-              <div key={index} className="p-6 rounded-xl text-left border border-gray-800">
-                <div className={`${feature.color} w-12 h-12 rounded-lg mb-4 flex items-center justify-center`}>
-                  <div className="w-6 h-6 bg-white rounded-full" />
+        {/* Why Choose Nexus Section */}
+        <div className="features-section" style={{display: activeSection === 'features' ? 'block' : 'none', opacity: 0}}>
+          <div className="bg-card rounded-xl shadow-xl p-6 border border-border h-full">
+            <h2 className="text-xl font-bold mb-5 text-center">Why Choose Nexus?</h2>
+            <div className="grid md:grid-cols-3 gap-5">
+              {[
+                {
+                  title: 'Deep Insights',
+                  description: 'Go beyond resumes with comprehensive analysis of actual skills',
+                  color: 'bg-primary/20',
+                  icon: BrainCircuit
+                },
+                {
+                  title: 'Time Saver',
+                  description: 'Reduce screening time by 80% with automated matching',
+                  color: 'bg-secondary/20',
+                  icon: Clock
+                },
+                {
+                  title: 'Better Matches',
+                  description: 'Proprietary algorithm identifies candidates most likely to succeed',
+                  color: 'bg-accent/20',
+                  icon: ThumbsUp
+                },
+              ].map((feature, index) => (
+                <div key={index} className="p-4 rounded-xl text-left border border-border">
+                  <div className={`${feature.color} w-10 h-10 rounded-lg mb-3 flex items-center justify-center`}>
+                    <feature.icon className="w-5 h-5 text-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-1">{feature.title}</h3>
+                  <p className="text-muted-foreground text-sm">{feature.description}</p>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-300">{feature.description}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   )
 }

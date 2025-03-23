@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { ChevronsUpDown, Sun, Moon } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { ChevronsUpDown, Sun, Moon, Monitor } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -28,17 +29,37 @@ export function NavUser({
     avatar: string
   }
 }) {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
+  const [mounted, setMounted] = useState(false)
+  const { theme, setTheme } = useTheme()
   const { isMobile } = useSidebar()
 
-  const handleThemeChange = () => {
-    const currentTheme =
-      localStorage.getItem('theme') === 'light' ? 'dark' : 'light'
+  // Ensure component is mounted to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
-    localStorage.setItem('theme', currentTheme)
-    setTheme(currentTheme)
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme)
+  }
 
-    window.dispatchEvent(new Event('storage'))
+  // Don't render theme options until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg">
+            <Avatar className="h-8 w-8 rounded-lg">
+              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarFallback className="rounded-lg">HL</AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium">{user.name}</span>
+              <span className="truncate text-xs">{user.email}</span>
+            </div>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    )
   }
 
   return (
@@ -85,18 +106,32 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={handleThemeChange}
+                onClick={() => handleThemeChange('light')}
               >
-                {theme === 'dark' ? (
-                  <>
-                    <Moon />
-                    Dark
-                  </>
-                ) : (
-                  <>
-                    <Sun />
-                    Light
-                  </>
+                <Sun className="h-4 w-4 mr-2" />
+                Light
+                {theme === 'light' && (
+                  <span className="ml-auto text-xs">(active)</span>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => handleThemeChange('dark')}
+              >
+                <Moon className="h-4 w-4 mr-2" />
+                Dark
+                {theme === 'dark' && (
+                  <span className="ml-auto text-xs">(active)</span>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => handleThemeChange('system')}
+              >
+                <Monitor className="h-4 w-4 mr-2" />
+                System
+                {theme === 'system' && (
+                  <span className="ml-auto text-xs">(active)</span>
                 )}
               </DropdownMenuItem>
             </DropdownMenuGroup>
