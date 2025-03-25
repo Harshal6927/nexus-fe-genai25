@@ -6,6 +6,19 @@ Add the backend server URL to the `src/lib/constants.ts` file.
 export const API_URL = 'your-backend-server-url'
 ```
 
+Create a `firebase.ts` file in the `src/utils` folder and add the following config with your Firebase project credentials.
+
+```ts
+export const firebaseConfig = {
+  apiKey: '',
+  authDomain: '',
+  projectId: '',
+  storageBucket: '',
+  messagingSenderId: '',
+  appId: '',
+}
+```
+
 Install the dependencies:
 
 ```bash
